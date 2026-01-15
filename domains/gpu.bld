@@ -1,0 +1,91 @@
+# gpu.bld - BLD for GPU Performance
+#
+# Status: VALIDATED (±15% prediction accuracy)
+#
+# Core Insight: GPU performance is alignment between algorithm structure
+# and hardware traverser structure.
+
+structure GPUBLD
+
+# =============================================================================
+# DIMENSIONS (D) - What repeats
+# =============================================================================
+
+D threads: T [parallel]
+D blocks: B [parallel]
+D warps: W [parallel, size=32]
+D elements: N [parallel]
+
+# =============================================================================
+# BOUNDARIES (B) - Where behavior partitions
+# =============================================================================
+
+B dispatch: cold | warm
+  cold -> first_kernel, ~2.1ms_overhead
+  warm -> subsequent, ~1.2ms_overhead
+
+B cache: in_L2 | out_L2
+  in_L2 -> working_set_lt_4MB, low_cost
+  out_L2 -> cache_pressure, 1.0-3.3x_multiplier
+
+B engine: memory | compute | copy
+  memory -> memory_bound_kernel
+  compute -> compute_bound_kernel
+  copy -> data_transfer
+
+# =============================================================================
+# LINKS (L) - What connects to what
+# =============================================================================
+
+# Memory access patterns (VALIDATED costs)
+L coalesced: threads -> memory (ns_per_access=0.028, pattern=sequential)
+L strided: threads -> memory (ns_per_access=0.034, pattern=regular_stride)
+L scattered: threads -> memory (ns_per_access=0.112, pattern=random)
+
+# Engine overlap model
+# When hardware engines run in parallel: Cost = max(engine_costs), not sum()
+L overlap: engine_a -> engine_b (efficiency=0.22, slowdown=4.5x)
+
+# =============================================================================
+# D×L SCALING
+# =============================================================================
+#
+# GEMM example:
+#   Compute = M × N × K × 2 FLOPs
+#   Memory = M×K + K×N + M×N elements
+#   Both scale with D (matrix dimensions)
+#
+# Cache efficiency model:
+#   Efficiency = sqrt(tile_size / working_set)
+#   Not linear! Tiled patterns follow sqrt model.
+
+# =============================================================================
+# PERFORMANCE PREDICTION (VALIDATED)
+# =============================================================================
+#
+# Time = dispatch_overhead + memory_time + compute_time
+#
+# where:
+#   memory_time = D × L_access × access_count
+#   compute_time = D × ops / throughput
+#
+# If engines overlap: Time = max(memory, compute) × overlap_factor
+#
+# Validation results:
+# | Size   | Predicted | Actual  | Error   |
+# |--------|-----------|---------|---------|
+# | 256²   | 1.51ms    | 1.33ms  | -13.6%  |
+# | 1024²  | 22.85ms   | 20.33ms | -12.4%  |
+# | 4096²  | 2030ms    | 1759ms  | -15.4%  |
+
+# =============================================================================
+# KERNEL OPTIMIZATION GUIDE
+# =============================================================================
+#
+# 1. Identify B: Cache boundaries, dispatch state
+# 2. Identify L: Memory patterns (coalesced?)
+# 3. Identify D: Parallelism (threads × blocks)
+# 4. Optimize: Coalesce memory (reduce L cost)
+# 5. Optimize: Tile for cache (respect B boundaries)
+
+returns: GPUAnalysis

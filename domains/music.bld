@@ -1,0 +1,136 @@
+# music.bld - BLD for Music
+#
+# Status: EXPLORATORY
+#
+# Core Insight: Music is structured time. The listener is a traverser.
+# Musical "feel" emerges from structural alignment between music and listener expectations.
+
+structure MusicBLD
+
+# =============================================================================
+# DIMENSIONS (D) - What repeats
+# =============================================================================
+
+D beats: N [sequential, pulse_grid]
+D measures: M [sequential, phrase_structure]
+D sections: S [sequential, form]
+D voices: V [parallel, polyphonic]
+D octaves: O [parallel, register]
+
+# =============================================================================
+# BOUNDARIES (B) - Where behavior partitions
+# =============================================================================
+
+B key: major | minor | modal | atonal
+  major -> bright, stable
+  minor -> dark, tense
+  modal -> ionian | dorian | phrygian | lydian | mixolydian | aeolian | locrian
+  atonal -> no_tonal_center
+
+B section: verse | chorus | bridge | intro | outro | coda
+  verse -> narrative, lower_energy
+  chorus -> hook, higher_energy
+  bridge -> contrast, transition
+
+B beat: downbeat | upbeat
+  downbeat -> strong, metric_anchor
+  upbeat -> weak, anticipation
+
+B cadence: perfect | imperfect | deceptive | half | plagal
+  perfect -> V_to_I, strong_resolution
+  imperfect -> to_V, incomplete
+  deceptive -> V_to_vi, surprise
+  half -> to_V, open
+  plagal -> IV_to_I, amen
+
+# =============================================================================
+# LINKS (L) - What connects to what
+# =============================================================================
+
+# Voice leading
+L voice_leading: chord_n -> chord_n_plus_1 (smoothness=low|high)
+
+# Tension/resolution
+L tension: dominant -> tonic (pull=strong, resolution=satisfying)
+
+# Interval consonance
+# L_consonance ~ -½ ln(1 - (a/b)²) where a:b is frequency ratio
+# Small whole-number ratios (2:1 octave, 3:2 fifth) have low L cost
+L interval: note_a -> note_b (ratio=a:b, consonance=varies)
+
+# Motivic connection
+L motif: theme -> variation (recognition=strong)
+
+# =============================================================================
+# D×L SCALING
+# =============================================================================
+#
+# More voices (D) = more voice-leading relationships (L)
+# More repetitions of a section don't change its key (B)
+#
+# Complexity = D × L_per_voice
+#   Simple:   D = 1 voice,  L = melody only
+#   Moderate: D = 4 voices, L = triadic harmony
+#   Complex:  D = 4 voices, L = extended harmony (7th, 9th, 11th)
+#
+# B invariance: Key is unchanged regardless of D
+
+# =============================================================================
+# THE LISTENER AS TRAVERSER
+# =============================================================================
+#
+# Listener B: Genre expectations, cultural familiarity, attention span
+# Listener L: Memory of previous phrases, prediction of next
+# Listener D: Working memory (~4 items), time span, training depth
+#
+# Alignment = Music B/L/D matches Listener B/L/D
+#
+# Aligned: Expectations met → satisfaction, groove, meaning
+# Misaligned: Surprise → interest or confusion, tension, alienation
+
+# =============================================================================
+# TENSION AND RESOLUTION
+# =============================================================================
+#
+# Tension = deliberate misalignment (high cost, unstable)
+# Resolution = alignment (low cost, stable)
+#
+# Harmonic tension:
+#   V → I: Resolution (strong L pull satisfied)
+#   ii → V: Building (partial alignment)
+#   V → vi: Deceptive (expected B violated)
+#
+# Rhythmic tension:
+#   On beat: Low (B alignment)
+#   Syncopation: Medium (L crosses B)
+#   Polyrhythm: High (multiple B conflict)
+
+# =============================================================================
+# COMPENSATION
+# =============================================================================
+#
+# L → B Compensation:
+#   Dense harmony (D×L) can substitute for clear structural boundaries
+#   Impressionism: Weak B (ambiguous key), rich L (extended chords)
+#   Minimalism: Clear B (ostinato), sparse L (triads)
+#
+# B Cannot Compensate for L:
+#   Clear structure without harmonic connection feels:
+#   - Mechanical (MIDI quantization)
+#   - Empty (power chords only)
+#   - Disconnected (random section order)
+
+# =============================================================================
+# EXPERIENTIAL SIGNALS
+# =============================================================================
+#
+# | Experience   | Structural Interpretation                |
+# |--------------|------------------------------------------|
+# | Groove       | D×L aligned with listener's pulse        |
+# | Surprise     | B violated (key change, deceptive)       |
+# | Satisfaction | L resolved to expected B                 |
+# | Boredom      | Too much D, not enough L variation       |
+# | Confusion    | B unclear, L too complex                 |
+# | Beauty       | Perfect alignment across B/L/D           |
+
+returns: MusicAnalysis

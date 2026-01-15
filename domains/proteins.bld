@@ -1,0 +1,120 @@
+# proteins.bld - BLD for Protein Folding
+#
+# Status: EXPLORATORY
+#
+# Core Insight: Folding is gradient descent on alignment landscape,
+# NOT exhaustive search through conformational space.
+
+structure ProteinBLD
+
+# =============================================================================
+# DIMENSIONS (D) - What repeats
+# =============================================================================
+
+D residues: N [sequential]          # Amino acid chain length
+D phi_psi: 2N [parallel]            # Backbone angles
+D contacts: M [parallel]            # Pairwise contacts
+D thermal: T [parallel]             # Thermal ensemble
+
+# =============================================================================
+# BOUNDARIES (B) - Where behavior partitions
+# =============================================================================
+
+B conformation: folded | unfolded | misfolded
+  folded -> native_state, functional
+  unfolded -> disordered, non_functional
+  misfolded -> alternative_minimum, pathogenic
+
+B secondary: alpha_helix | beta_sheet | coil | turn
+  alpha_helix -> H_bond_i_to_i_plus_4
+  beta_sheet -> H_bond_between_strands
+  coil -> no_regular_structure
+  turn -> reversal
+
+B region: ordered | disordered | switch
+  ordered -> stable_structure
+  disordered -> intrinsically_flexible
+  switch -> conformational_change_site
+
+# =============================================================================
+# LINKS (L) - What connects to what
+# =============================================================================
+
+# Backbone connectivity
+L backbone: residue_i -> residue_i_plus_1 (covalent=true)
+
+# Hydrogen bonds
+L h_bond: donor -> acceptor (energy=-2_to_-7_kcal_mol)
+
+# Hydrophobic contacts
+L hydrophobic: nonpolar_i -> nonpolar_j (burial_energy=varies)
+
+# Disulfide bridges
+L disulfide: cys_i -> cys_j (covalent=true, stabilizing=true)
+
+# Template-directed (prion)
+L template: prion_sc -> native (converts=true, lowers_barrier=true)
+
+# =============================================================================
+# LEVINTHAL PARADOX RESOLUTION
+# =============================================================================
+#
+# Paradox: Proteins fold in milliseconds despite astronomical conformations.
+#
+# BLD Resolution: Speed comes from locality of alignment.
+#   Folding = gradient descent on alignment landscape
+#   NOT exhaustive search through conformations
+#
+# Each step follows local alignment gradient:
+#   1. Hydrophobic collapse (L: hydrophobic contacts)
+#   2. Secondary structure formation (L: H-bonds)
+#   3. Tertiary packing (B: steric boundaries)
+
+# =============================================================================
+# THE PRION PROBLEM
+# =============================================================================
+#
+# Question: Why does the same sequence fold two different ways?
+#
+# PrP^C (Native):
+#   Structure: α-helix dominated
+#   Alignment: Optimized for aqueous physics
+#   Stability: Kinetically trapped
+#
+# PrP^Sc (Pathogenic):
+#   Structure: β-sheet dominated
+#   Alignment: Alternative minimum
+#   Stability: Thermodynamically lower (aggregation-prone)
+#
+# BLD Explanation: Two traversers
+#   1. Water physics: Favors helix (PrP^C)
+#   2. Template (PrP^Sc): Provides different alignment landscape
+
+# =============================================================================
+# KEY PREDICTIONS
+# =============================================================================
+#
+# 1. Mutations changing alignment → break folding
+# 2. Chaperones → additional traverser (flatten landscape)
+# 3. Intrinsically disordered → equal alignment folded/unfolded
+# 4. Temperature increase → thermal D dominates → unfolding
+# 5. Prion infectivity → template provides better alignment than water
+
+# =============================================================================
+# PRACTICAL APPLICATIONS
+# =============================================================================
+#
+# Stability prediction:
+#   B: Count conformational switches
+#   L: Sum contact energies (H-bonds, hydrophobic)
+#   D: Chain length, repeat domains
+#   Stability ∝ L_contacts - D × entropy_cost
+#
+# Misfolding risk:
+#   High when: Multiple B minima, strong L aggregation, high D
+#
+# Drug design:
+#   Target: Alter alignment landscape
+#   Methods: Stabilize native B, disrupt pathogenic L, reduce effective D
+
+returns: ProteinAnalysis

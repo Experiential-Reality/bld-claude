@@ -1,0 +1,140 @@
+# physics.bld - BLD for Physics
+#
+# Status: MIXED (Thermo/Circuits VALIDATED, others EXPLORATORY)
+#
+# Core Insight: Physics IS a traverser. Physical laws define structural constraints.
+# When any structure aligns with physics, alignment cost IS physical energy.
+
+structure PhysicsBLD
+
+# =============================================================================
+# DIMENSIONS (D) - What repeats
+# =============================================================================
+
+D particles: N [parallel]
+D spatial: 3 [parallel]             # 3D space
+D temporal: 1 [sequential]          # Time
+D qubits: Q [parallel]              # Quantum systems: Hilbert dim = 2^Q
+D lattice: L [parallel]             # System size
+
+# =============================================================================
+# BOUNDARIES (B) - Where behavior partitions
+# =============================================================================
+
+# Rule 1: B = Topological (Invariant Under D)
+# X(D) = X(D') for all D, D' → X is B
+
+B phase: solid | liquid | gas | plasma
+  solid -> ordered, low_entropy
+  liquid -> disordered, medium_entropy
+  gas -> maximally_disordered, high_entropy
+  plasma -> ionized
+
+B critical: subcritical | critical | supercritical
+  subcritical -> finite_correlation_length
+  critical -> divergent_correlation, scale_invariance
+  supercritical -> continuous
+
+B quantum_state: superposition | collapsed
+  superposition -> coherent
+  collapsed -> measured, classical
+
+# Invariant thresholds (do not scale with D)
+# V_th, c, T_c, Re_c, σ
+
+# =============================================================================
+# LINKS (L) - What connects to what
+# =============================================================================
+
+# Rule 2: L = Geometric (Scales with D)
+# X(αD) = α^k × X(D) for some k > 0 → X is L
+
+L coupling: particle_i -> particle_j (force=F, constant=α)
+L field: source -> field_point (potential=A_μ, energy=U)
+L correlation: region_a -> region_b (fisher_metric=g, length=ξ)
+L entanglement: qubit_a -> qubit_b (entropy=S_A)
+
+# Scaling examples: C ~ n, U ~ V, S ~ n
+
+# =============================================================================
+# THE MAPPING RULES
+# =============================================================================
+#
+# Rule 1: B = Topological
+#   Observable X is B if X(D) = X(D') for all D
+#   Examples: V_th, c, T_c, Re_c, σ
+#
+# Rule 2: L = Geometric
+#   Observable X is L if X(αD) = α^k × X(D)
+#   Examples: Capacitance, field energy, entanglement entropy
+#
+# Rule 3: D = Repetition Count
+#   Observable X is D if X = integer count of homogeneous elements
+#   Examples: Particle number N, spatial dim d, qubit count
+
+# =============================================================================
+# DOMAIN STATUS
+# =============================================================================
+#
+# | Domain           | Status      | Key Validations               |
+# |------------------|-------------|-------------------------------|
+# | Thermodynamics   | VALIDATED   | 10/10 tests, Second Law       |
+# | Circuits         | VALIDATED   | R² = 1.0 for D×L scaling      |
+# | Electromagnetism | EXPLORATORY | U(1) gauge reframed           |
+# | Quantum          | EXPLORATORY | B = measurement, L = entangle |
+# | Fluids           | EXPLORATORY | Re as B, viscosity as L       |
+# | Phase Transitions| EXPLORATORY | Critical phenomena as B       |
+
+# =============================================================================
+# D×L SCALING IN PHYSICS
+# =============================================================================
+#
+# The principle: D multiplies L, not B
+#
+# | System           | D         | L              | B (invariant)    |
+# |------------------|-----------|----------------|------------------|
+# | Capacitor array  | N devices | C_single       | V_breakdown      |
+# | Magnetic material| N atoms   | Magnetization  | T_Curie          |
+# | Quantum system   | N qubits  | Entanglement   | Measurement rule |
+# | Fluid pipe       | Length L  | Viscous flow   | Re_critical      |
+#
+# Cost formula: Physical energy = B_cost + D × L_cost
+
+# =============================================================================
+# COMPENSATION IN PHYSICS
+# =============================================================================
+#
+# L → B Compensation:
+#   | System         | Mechanism     | Effect              |
+#   |----------------|---------------|---------------------|
+#   | Antenna array  | N elements    | Beam steering       |
+#   | Neural network | Cascaded      | Sharp classification|
+#   | Error correct  | Entangled     | Fault tolerance     |
+#
+# B Cannot Compensate for L:
+#   Circuit without feedback → can't stabilize
+#   Shielding without coupling → blocks all signals
+#   Measurement without entanglement → no quantum advantage
+
+# =============================================================================
+# INTENSIVE VS EXTENSIVE
+# =============================================================================
+#
+# | Property Type              | BLD | Examples                    |
+# |----------------------------|-----|-----------------------------|
+# | Intensive (size-independent)| B   | Temperature, pressure       |
+# | Extensive (scales with size)| L/D | Energy, volume, entropy     |
+
+# =============================================================================
+# FALSIFICATION TESTS
+# =============================================================================
+#
+# Any physics BLD mapping should pass:
+#   1. B invariance: X(D) = X(D') for all system sizes
+#   2. L scaling: X(αD) = α^k × X(D) for k > 0
+#   3. Cost decomposition: Total = B + D×L with independent measurements
+#   4. Compensation asymmetry: L→B works, B→L fails
+#
+# If any test fails, revise the mapping.
+
+returns: PhysicsAnalysis

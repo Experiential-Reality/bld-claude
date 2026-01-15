@@ -1,0 +1,177 @@
+# skill.bld - BLD Claude Skill Structure
+#
+# This structure defines how Claude applies BLD analysis.
+# The skill itself IS a BLD structure - meta-recursion.
+#
+# Optimized for Claude's attention limits:
+#   - Front-loaded critical info (first 20 lines = 80% of tasks)
+#   - Minimal B (few mode switches)
+#   - Local L (self-contained domains)
+#   - Lazy D (domains loaded on-demand)
+
+structure ClaudeBLDSkill
+
+# =============================================================================
+# MANDATORY WORKFLOW - DO THIS EVERY TIME
+# =============================================================================
+#
+# BLD is a language for articulating structure. Writing .bld forces precision.
+#
+# 1. WRITE in .bld         → Articulate structure formally, not in prose
+# 2. RUN  bld parse        → See the structure you've articulated
+# 3. RUN  bld cost         → Measure alignment cost
+# 4. ITERATE               → Refine until articulation matches reality
+#
+# The structure is the artifact. The language reveals it.
+
+# =============================================================================
+# BLD TOOLS - the language draws itself
+# =============================================================================
+#
+# bld parse <file.bld>    → See the structure
+# bld cost <file.bld>     → Measure alignment cost
+# bld doc <file.bld>      → Generate documentation
+# bld run <file.bld>      → Execute/traverse structure
+# bld compile <file.bld>  → Compile to binary
+#
+# WHY SELF-REFERENTIAL?
+#
+# BLD describes structure. The BLD toolchain IS structure.
+# Therefore BLD describes itself. This isn't clever recursion -
+# it's the only consistent choice. A language for structure that
+# can't express its own structure would be incomplete.
+#
+# Draw everything with BLD. If you can't draw it, you don't understand it.
+
+# =============================================================================
+# FORMULAS
+# =============================================================================
+#
+# Cost = B + D×L
+# L = -½ ln(1 - ρ²)
+#
+# THE THREE QUESTIONS:
+#   Q1: Where does behavior partition? → B
+#   Q2: What connects to what? → L
+#   Q3: What repeats? → D
+#
+# KEY PRINCIPLES:
+#   - D×L scaling: D multiplies L, not B
+#   - Compensation: L can compensate for B deficiency, not vice versa
+#   - B is topological (invariant), L is geometric (scales)
+
+# =============================================================================
+# BOUNDARIES (B) - Where behavior partitions
+# =============================================================================
+
+# The workflow - MANDATORY steps
+B workflow: write_bld | run_parse | run_cost | iterate
+  write_bld -> articulate_formally, not_prose, file=<name>.bld
+  run_parse -> bld_parse, see_structure, verify_articulation
+  run_cost -> bld_cost, measure_alignment, check_DxL
+  iterate -> refine_articulation, match_reality
+
+# The three questions - core method
+B question: q1_partition | q2_connection | q3_repetition
+  q1_partition -> ask("Where does behavior partition?"), find(B)
+  q2_connection -> ask("What connects to what?"), find(L)
+  q3_repetition -> ask("What repeats?"), find(D)
+
+# The three primitives - fundamental types
+B primitive: boundary | link | dimension
+  boundary -> topological, invariant_under_D, local_scope
+  link -> geometric, scales_with_D, can_span_distance
+  dimension -> multiplier_on_L, not_on_B
+
+# BLD tool commands - the language's own toolchain
+B tool: parse | cost | doc | run | compile
+  parse -> see_structure, normalize, verify
+  cost -> measure_alignment, B_plus_DxL
+  doc -> generate_documentation, bld_all_the_way_down
+  run -> execute, traverse
+  compile -> binary, optimize
+
+# Epistemic status - how validated is the claim
+B epistemic: validated | derived | mechanism | exploratory | foundational
+  validated -> empirical_tests_pass, quantitative_metrics
+  derived -> mathematical_proof, follows_from_BLD
+  mechanism -> structure_identified, values_TBD
+  exploratory -> hypothesis, needs_testing
+  foundational -> core_definition, axiomatic
+
+# =============================================================================
+# LINKS (L) - What connects to what
+# =============================================================================
+
+# Workflow sequence - MANDATORY, sequential
+L workflow_seq: write_bld -> run_parse -> run_cost -> iterate (deps=1, sequential=true)
+
+# Core analysis flow
+L apply_questions: system -> structure (deps=1)
+L extract_B: system -> boundaries (deps=0)
+L extract_L: system -> links (deps=0)
+L extract_D: system -> dimensions (deps=0)
+
+# Validation chain
+L validate: hypothesis -> evidence (deps=1)
+
+# Compensation (asymmetric - L can compensate B, not vice versa)
+L compensate: L -> B_deficiency (deps=1, direction=forward_only)
+
+# Domain loading (lazy - only when needed)
+L load_domain: question -> domain (uses=domains/*.bld, deps=0)
+
+# =============================================================================
+# DIMENSIONS (D) - What repeats
+# =============================================================================
+
+# Domains are loaded lazily (not all at once)
+D domains: N [parallel, lazy]
+
+# The three questions always apply
+D questions: 3 [sequential]
+
+# The three primitives are fixed
+D primitives: 3 [parallel]
+
+# =============================================================================
+# OUTPUT FORMAT
+# =============================================================================
+#
+# ## BLD Structure: [System Name]
+#
+# ### Boundaries (B)
+# | Boundary | Partitions | Threshold | Properties |
+# |----------|------------|-----------|------------|
+#
+# ### Links (L)
+# | Link | Source | Target | deps | Type |
+# |------|--------|--------|------|------|
+#
+# ### Dimensions (D)
+# | Dimension | Extent | Properties |
+# |-----------|--------|------------|
+#
+# ### D×L Scaling
+# - L properties that scale: [list]
+# - B properties invariant: [list]
+#
+# ### Cost
+# Cost = B + D×L = ...
+
+# =============================================================================
+# DOMAIN VALIDATION SUMMARY (reference only - details in domain files)
+# =============================================================================
+#
+# | Domain   | Status      | Key Metric        |
+# |----------|-------------|-------------------|
+# | VI       | VALIDATED   | R² = 0.99         |
+# | Neural   | VALIDATED   | 6.2% compensation |
+# | Circuits | VALIDATED   | R² = 1.0          |
+# | Thermo   | VALIDATED   | 10/10 tests       |
+# | GPU      | VALIDATED   | ±15% prediction   |
+# | Physics  | MIXED       | varies by domain  |
+# | Proteins | EXPLORATORY | structure mapped  |
+# | Music    | EXPLORATORY | L formula applies |
+
+returns: StructuralAnalysis

@@ -1,0 +1,151 @@
+# refactoring.bld - BLD for Software Refactoring
+#
+# Status: FOUNDATIONAL
+#
+# Core Principle: "Make state explicit" = align code structure with its inherent BLD.
+# Refactoring is realignment. The goal is to reveal structure that already exists.
+
+structure RefactoringBLD
+
+# =============================================================================
+# DIMENSIONS (D) - What repeats
+# =============================================================================
+
+D parameters: N [parallel, config]
+D handlers: H [parallel, dispatch]
+D dependencies: M [parallel, dag]
+
+# =============================================================================
+# BOUNDARIES (B) - Where behavior partitions
+# =============================================================================
+
+B code_state: explicit | hidden
+  explicit -> glide, readable, optimizable
+  hidden -> friction, hard_to_understand, hard_to_optimize
+
+B pattern: dispatch | enumeration | dag | antipattern
+  dispatch -> if_elif_chain_to_dict
+  enumeration -> magic_numbers_to_config
+  dag -> implicit_deps_to_explicit
+  antipattern -> god_object | stringly_typed | circular
+
+# =============================================================================
+# LINKS (L) - What connects to what
+# =============================================================================
+
+L dependency: module_a -> module_b (explicit=bool, cyclic=bool)
+L dispatch: event_type -> handler (via=dict|if_chain)
+L data_flow: input -> output (visible=bool)
+
+# =============================================================================
+# THREE REFACTORING PATTERNS
+# =============================================================================
+#
+# | Pattern          | Hidden State          | BLD  | Fix                |
+# |------------------|-----------------------|------|--------------------|
+# | Dispatch tables  | Implicit state machine| B    | Extract to dict    |
+# | Enumeration      | Invisible state space | D    | Config dataclass   |
+# | DAG dependencies | Hidden coupling       | L    | Break cycles       |
+
+# =============================================================================
+# PATTERN 1: DISPATCH TABLES (B)
+# =============================================================================
+#
+# Before (Hidden B):
+#   def handle(event):
+#       if event.type == "click": handle_click(event)
+#       elif event.type == "hover": handle_hover(event)
+#       ...
+#
+# After (Explicit B):
+#   HANDLERS = {"click": handle_click, "hover": handle_hover}
+#   def handle(event): HANDLERS[event.type](event)
+#
+# Why better: B (event types) explicit, compiler optimizes, easy to extend
+
+# =============================================================================
+# PATTERN 2: ENUMERATION (D)
+# =============================================================================
+#
+# Before (Hidden D):
+#   def process():
+#       timeout = 30
+#       retries = 3
+#       ...
+#
+# After (Explicit D):
+#   @dataclass
+#   class Config:
+#       timeout: int = 30
+#       retries: int = 3
+#
+#   def process(config: Config): ...
+#
+# Why better: D (parameters) explicit, testable, clear what varies
+
+# =============================================================================
+# PATTERN 3: DAG DEPENDENCIES (L)
+# =============================================================================
+#
+# Before (Hidden L):
+#   def compute_result():
+#       a = fetch_a()
+#       b = compute_b(a)  # depends on a
+#       c = compute_c(a)  # depends on a
+#       d = combine(b, c) # depends on b, c
+#       return d
+#
+# After (Explicit L):
+#   dag.add_edge("a", "b", compute_b)
+#   dag.add_edge("a", "c", compute_c)
+#   dag.add_edge(["b", "c"], "d", combine)
+#
+# Why better: L visible, enables parallelism (b,c together), testable
+
+# =============================================================================
+# PERFORMANCE CONNECTION
+# =============================================================================
+#
+# | Refactoring      | Performance Benefit                        |
+# |------------------|--------------------------------------------|
+# | Explicit B       | Branch prediction, indirect call elim      |
+# | Explicit D       | Constant propagation, vectorization        |
+# | Explicit L       | Parallelism, cache locality                |
+#
+# Same structures that make code readable enable optimization.
+
+# =============================================================================
+# ANTI-PATTERNS
+# =============================================================================
+#
+# | Anti-Pattern    | Problem                      | BLD Fix              |
+# |-----------------|------------------------------|----------------------|
+# | God object      | Hidden B (modes), hidden L   | Split by responsibility|
+# | Stringly-typed  | B encoded in strings         | Use enums/types      |
+# | Implicit state  | Hidden D (state space)       | State machine        |
+# | Circular deps   | Tangled L                    | Break cycles, events |
+
+# =============================================================================
+# EXPERIENTIAL SIGNALS
+# =============================================================================
+#
+# When reading code, notice your experience:
+#   Glide = structure is explicit, aligned
+#   Friction = hidden state, implicit structure
+#   Loops = circular dependencies
+#   Gaps = hidden L (references you can't see)
+#
+# Use friction as diagnostic: Where friction exists, structure is hidden.
+
+# =============================================================================
+# THE REFACTORING PROCESS
+# =============================================================================
+#
+# 1. Read code, notice friction — Where does processing feel hard?
+# 2. Interpret the signal — What's hidden? (B? L? D?)
+# 3. Apply the pattern — Extract hidden structure explicitly
+# 4. Verify with re-read — Does it glide now?
+#
+# When refactoring succeeds, you've aligned code with its inherent BLD.
+
+returns: RefactoredCode

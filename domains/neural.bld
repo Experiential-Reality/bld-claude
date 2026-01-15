@@ -1,0 +1,107 @@
+# neural.bld - BLD for Neural Networks
+#
+# Status: VALIDATED
+# Key Finding: 6.2% diagonal advantage when structure matches
+#
+# Core Insight: Architectures succeed when their B/L/D aligns with data's B/L/D.
+# Neural networks are traversers. Data has structure. Learning IS alignment.
+
+structure NeuralBLD
+
+# =============================================================================
+# DIMENSIONS (D) - What repeats
+# =============================================================================
+
+D batch: B [parallel]
+D layers: L [sequential]
+D hidden: H [parallel]
+D spatial: S [parallel]        # For CNNs: H × W
+D channels: C [parallel]       # Feature maps
+D sequence: T [sequential]     # For Transformers
+D heads: A [parallel]          # Attention heads
+
+# =============================================================================
+# BOUNDARIES (B) - Where behavior partitions
+# =============================================================================
+
+B activation: linear | nonlinear
+  linear -> no_boundary, continuous_gradient
+  nonlinear -> ReLU | sigmoid | tanh | softmax
+
+B architecture: MLP | CNN | Transformer
+  MLP -> dense_L, simple_B, batch_layers_hidden
+  CNN -> sparse_local_L, pooling_B, batch_spatial_channels
+  Transformer -> dynamic_L, attention_mask_B, batch_seq_heads
+
+B pooling: max | average | none
+  max -> hard_boundary, winner_take_all
+  average -> soft_boundary, smooth
+  none -> no_additional_B
+
+# =============================================================================
+# LINKS (L) - What connects to what
+# =============================================================================
+
+# Connectivity types
+L connectivity: neurons -> neurons (pattern=dense|sparse|dynamic)
+
+# MLP: Global L (dense connectivity)
+L mlp_weights: layer_n -> layer_n_plus_1 (deps=1, pattern=dense)
+
+# CNN: Local L (sparse kernels)
+L conv_kernel: receptive_field -> output (deps=1, pattern=sparse, locality=local)
+
+# Transformer: Dynamic L (attention)
+L attention: query -> key_value (deps=0, pattern=dynamic, content_dependent=true)
+
+# =============================================================================
+# COMPENSATION PRINCIPLE (VALIDATED)
+# =============================================================================
+#
+# Statement: Global L can compensate for B deficiency, local L cannot.
+#
+# Why the asymmetry (BLD predicts itself):
+#   - B (activations) is topological: each neuron partitions locally, invariant under D
+#   - L (connectivity) is geometric: dense L spans globally, sparse L stays local
+#   - D×L accumulates: deep networks cascade soft boundaries → sharp decisions
+#   - D×B stays local: each neuron still makes its own local decision
+#
+# L compensate: global_L -> B_deficiency (direction=forward_only)
+
+# =============================================================================
+# VALIDATED FORMULA
+# =============================================================================
+#
+# Performance = a - b₁·ΔL - c·ΔB·ΔL
+#
+# Note: No independent ΔB term! B only matters when L is also mismatched.
+#
+# Results:
+#   - L effect: b₁ ≈ 0.025 per unit ΔL
+#   - B×L interaction: c ≈ 0.061
+#   - Diagonal advantage: 6.2% when structure matches
+
+# =============================================================================
+# D×L SCALING
+# =============================================================================
+#
+# Width scaling (D = neuron count):
+#   Parameters = D² × L_weights  (quadratic)
+#   Compute = D × L_ops          (linear)
+#   Threshold (B) = unchanged    (activation at x=0)
+#
+# Depth scaling (D = layer count):
+#   Representational power grows exponentially
+#   This is L compensating for B (limited per-layer expressivity)
+
+# =============================================================================
+# ARCHITECTURE ALIGNMENT
+# =============================================================================
+#
+# | Data Property          | Aligned Architecture | Why                       |
+# |------------------------|---------------------|---------------------------|
+# | Spatial locality       | CNN                 | Local L matches features  |
+# | Sequential/contextual  | Transformer         | Dynamic L matches context |
+# | No special structure   | MLP                 | Dense L handles anything  |
+
+returns: NetworkAnalysis
