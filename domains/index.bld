@@ -1,0 +1,60 @@
+# domains/index.bld - Validated Application Domains
+#
+# Cost: B=8, D=8 → Split into separate files, lazy load
+#
+# Eight domains where BLD has been applied and validated.
+
+structure ValidatedDomains
+
+# =============================================================================
+# DOMAIN STATUS SUMMARY
+# =============================================================================
+#
+# | Domain      | Status      | Key Metric              | L Formula  |
+# |-------------|-------------|-------------------------|------------|
+# | VI          | VALIDATED   | R² = 0.99               | Exact      |
+# | Neural      | VALIDATED   | 6.2% compensation       | Approx     |
+# | Circuits    | VALIDATED   | R² = 1.0, 87.8% comp    | Exact      |
+# | Thermo      | VALIDATED   | 10/10 tests             | Derived    |
+# | GPU         | VALIDATED   | ±15% prediction         | Calibrated |
+# | Proteins    | EXPLORATORY | Mechanism mapped        | Predicted  |
+# | Physics     | MIXED       | Varies by subdomain     | Varies     |
+# | Refactoring | FOUNDATIONAL| Structure mapped        | N/A        |
+
+B domain: vi | neural | circuits | thermo | gpu | proteins | physics | refactoring
+  vi -> uses=domains/vi.bld, status=VALIDATED
+  neural -> uses=domains/neural.bld, status=VALIDATED
+  circuits -> uses=domains/circuits.bld, status=VALIDATED
+  thermo -> uses=domains/thermo.bld, status=VALIDATED
+  gpu -> uses=domains/gpu.bld, status=VALIDATED
+  proteins -> uses=domains/proteins.bld, status=EXPLORATORY
+  physics -> uses=domains/physics.bld, status=MIXED
+  refactoring -> uses=domains/refactoring.bld, status=FOUNDATIONAL
+
+# =============================================================================
+# VALIDATION CRITERIA
+# =============================================================================
+#
+# VALIDATED requires:
+#   - Quantitative predictions
+#   - Empirical tests
+#   - R² > 0.9 or error < 20%
+#
+# EXPLORATORY means:
+#   - Structure mapped
+#   - Predictions made
+#   - Tests pending or partial
+#
+# FOUNDATIONAL means:
+#   - Core methodology
+#   - Substrate-independent
+#   - Self-referential application
+
+D domains: 8 [parallel, lazy_load]
+
+L cross_validate: domain_a -> domain_b (deps=0, pattern=same_primitives)
+
+# The same three primitives work in ALL domains.
+# This is the substrate independence principle.
+
+returns: DomainExpertise
